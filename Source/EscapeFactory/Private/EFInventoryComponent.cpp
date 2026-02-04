@@ -1,0 +1,108 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "EFInventoryComponent.h"
+
+#include "EFItemDataAsset.h"
+
+// Sets default values for this component's properties
+UEFInventoryComponent::UEFInventoryComponent()
+{
+	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
+	// off to improve performance if you don't need them.
+	PrimaryComponentTick.bCanEverTick = false;
+
+	// ...
+}
+
+
+// Called when the game starts
+void UEFInventoryComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	Slots.SetNum(MaxSlots);
+}
+
+int32 UEFInventoryComponent::AddItem(UEFItemDataAsset* Item, int32 Amount)
+{
+	EFCHECK(nullptr != Item || Amount <= 0, Amount);
+	
+	// 기존 스택에 추가 시도
+	for (FEFItemSlot& Slot : Slots)
+	{
+		if (Slot.ItemData == Item)
+		{
+			int32 Addable = Item->MaxStackSize - Slot.Quantity;
+			int32 ToAdd = FMath::Min(Addable, Amount);
+			
+			Slot.Quantity += ToAdd;
+			Amount -= ToAdd;
+			
+			if (Amount <= 0)
+			{
+				return 0;
+			}
+		}
+	}
+	
+	// 빈 슬롯에 추가 시도
+	for (FEFItemSlot& Slot : Slots)
+	{
+		if (Slot.IsEmpty())
+		{
+			Slot.ItemData = Item;
+			int32 ToAdd = FMath::Min(Item->MaxStackSize, Amount);
+			
+			Slot.Quantity += ToAdd;
+			Amount -= ToAdd;
+			
+			if (Amount <= 0)
+			{
+				return 0;
+			}
+		}
+	}
+	
+	return Amount;
+}
+
+bool UEFInventoryComponent::RemoveItem(UEFItemDataAsset* Item, int32 Amount)
+{
+	EFCHECK(HasEnoughItem(Item, Amount), false);
+
+	for (FEFItemSlot& Slot : Slots)
+	{
+		if (Slot.ItemData == Item)
+		{
+			int32 ToRemove = FMath::Min(Amount, Slot.Quantity);
+			Slot.Quantity -= ToRemove;
+			Amount -= ToRemove;
+
+			if (Slot.Quantity <= 0)
+			{
+				Slot.ItemData = nullptr;
+			}
+			if (Amount <= 0) 
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool UEFInventoryComponent::HasEnoughItem(UEFItemDataAsset* Item, int32 Amount)
+{
+	int32 TotalFound = 0;
+	for (const FEFItemSlot& Slot : Slots)
+	{
+		if (Slot.ItemData == Item)
+		{
+			TotalFound += Slot.Quantity;
+		}
+	}
+	return TotalFound >= Amount;
+}
+
+
