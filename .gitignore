@@ -13,7 +13,7 @@ Saved
 *.xcodeproj
 *.xcworkspace
 
-.idea\
-.vsconfig\
+.idea/
+.vsconfig
 gemini.md
-Plans\
+Plans/
