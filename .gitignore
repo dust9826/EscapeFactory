@@ -12,3 +12,8 @@ Saved
 *.suo
 *.xcodeproj
 *.xcworkspace
+
+.idea\
+.vsconfig\
+gemini.md
+Plans\
