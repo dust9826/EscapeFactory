@@ -61,7 +61,10 @@ struct FEFItemStack
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Quantity = 0;
 
-	FEFItemStack() : Item(), Quantity(0) {}
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsLocked;
+	
+	FEFItemStack() : Item(), Quantity(0), bIsLocked(false) {}
 	
 	// 중첩(Stacking) 가능 여부 체크 도우미
 	bool CanStackWith(const FEFItemStack& Other) const {

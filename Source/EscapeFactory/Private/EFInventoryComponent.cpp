@@ -22,6 +22,13 @@ void UEFInventoryComponent::BeginPlay()
 	Super::BeginPlay();
 
 	Slots.SetNum(MaxSlots);
+	if (bIsLocked)
+	{
+		for (FEFItemStack& Slot : Slots)
+		{
+			Slot.bIsLocked = true;
+		}
+	}
 }
 
 int32 UEFInventoryComponent::AddItem(FEFItemInstance& Item, int32 Amount)
@@ -49,7 +56,7 @@ int32 UEFInventoryComponent::AddItem(FEFItemInstance& Item, int32 Amount)
 	// 빈 슬롯에 추가 시도
 	for (FEFItemStack& Slot : Slots)
 	{
-		if (Slot.IsEmpty())
+		if (Slot.IsEmpty() && !Slot.bIsLocked)
 		{
 			Slot.Item.ItemData = Item.ItemData;
 			int32 ToAdd = FMath::Min(Item.ItemData->MaxStackSize, Amount);
@@ -79,7 +86,7 @@ bool UEFInventoryComponent::RemoveItem(FEFItemInstance& Item, int32 Amount)
 			Slot.Quantity -= ToRemove;
 			Amount -= ToRemove;
 
-			if (Slot.Quantity <= 0)
+			if (Slot.Quantity <= 0 && !Slot.bIsLocked)
 			{
 				Slot.Item.ItemData = nullptr;
 			}
