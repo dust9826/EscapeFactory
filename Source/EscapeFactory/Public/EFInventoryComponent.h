@@ -6,9 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "EFInventoryComponent.generated.h"
 
-
-struct FEFItemSlot;
-class UEFItemDataAsset;
+struct FEFItemInstance;
+struct FEFItemStack;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ESCAPEFACTORY_API UEFInventoryComponent : public UActorComponent
@@ -25,19 +24,20 @@ protected:
 
 public:	
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	int32 AddItem(UEFItemDataAsset* Item, int32 Amount);
+	int32 AddItem(FEFItemInstance& Item, int32 Amount);
 	
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	bool RemoveItem(UEFItemDataAsset* Item, int32 Amount);
+	bool RemoveItem(FEFItemInstance& Item, int32 Amount);
 	
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	bool HasEnoughItem(UEFItemDataAsset* Item, int32 Amount);
+	bool HasEnoughItem(FEFItemInstance& Item, int32 Amount);
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
 	int32 MaxSlots = 10;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
-	TArray<FEFItemSlot> Slots;
+	TArray<FEFItemStack> Slots;
 		
+	
 };

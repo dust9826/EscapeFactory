@@ -24,16 +24,16 @@ void UEFInventoryComponent::BeginPlay()
 	Slots.SetNum(MaxSlots);
 }
 
-int32 UEFInventoryComponent::AddItem(UEFItemDataAsset* Item, int32 Amount)
+int32 UEFInventoryComponent::AddItem(FEFItemInstance& Item, int32 Amount)
 {
-	EFCHECK(nullptr != Item || Amount <= 0, Amount);
+	EFCHECK(nullptr != Item.ItemData || Amount <= 0, Amount);
 	
 	// 기존 스택에 추가 시도
-	for (FEFItemSlot& Slot : Slots)
+	for (FEFItemStack& Slot : Slots)
 	{
-		if (Slot.ItemData == Item)
+		if (Slot.CanStackWith(Item))
 		{
-			int32 Addable = Item->MaxStackSize - Slot.Quantity;
+			int32 Addable = Item.ItemData->MaxStackSize - Slot.Quantity;
 			int32 ToAdd = FMath::Min(Addable, Amount);
 			
 			Slot.Quantity += ToAdd;
@@ -47,12 +47,12 @@ int32 UEFInventoryComponent::AddItem(UEFItemDataAsset* Item, int32 Amount)
 	}
 	
 	// 빈 슬롯에 추가 시도
-	for (FEFItemSlot& Slot : Slots)
+	for (FEFItemStack& Slot : Slots)
 	{
 		if (Slot.IsEmpty())
 		{
-			Slot.ItemData = Item;
-			int32 ToAdd = FMath::Min(Item->MaxStackSize, Amount);
+			Slot.Item.ItemData = Item.ItemData;
+			int32 ToAdd = FMath::Min(Item.ItemData->MaxStackSize, Amount);
 			
 			Slot.Quantity += ToAdd;
 			Amount -= ToAdd;
@@ -67,13 +67,13 @@ int32 UEFInventoryComponent::AddItem(UEFItemDataAsset* Item, int32 Amount)
 	return Amount;
 }
 
-bool UEFInventoryComponent::RemoveItem(UEFItemDataAsset* Item, int32 Amount)
+bool UEFInventoryComponent::RemoveItem(FEFItemInstance& Item, int32 Amount)
 {
 	EFCHECK(HasEnoughItem(Item, Amount), false);
 
-	for (FEFItemSlot& Slot : Slots)
+	for (FEFItemStack& Slot : Slots)
 	{
-		if (Slot.ItemData == Item)
+		if (Slot.CanStackWith(Item))
 		{
 			int32 ToRemove = FMath::Min(Amount, Slot.Quantity);
 			Slot.Quantity -= ToRemove;
@@ -81,7 +81,7 @@ bool UEFInventoryComponent::RemoveItem(UEFItemDataAsset* Item, int32 Amount)
 
 			if (Slot.Quantity <= 0)
 			{
-				Slot.ItemData = nullptr;
+				Slot.Item.ItemData = nullptr;
 			}
 			if (Amount <= 0) 
 			{
@@ -92,12 +92,12 @@ bool UEFInventoryComponent::RemoveItem(UEFItemDataAsset* Item, int32 Amount)
 	return false;
 }
 
-bool UEFInventoryComponent::HasEnoughItem(UEFItemDataAsset* Item, int32 Amount)
+bool UEFInventoryComponent::HasEnoughItem(FEFItemInstance& Item, int32 Amount)
 {
 	int32 TotalFound = 0;
-	for (const FEFItemSlot& Slot : Slots)
+	for (const FEFItemStack& Slot : Slots)
 	{
-		if (Slot.ItemData == Item)
+		if (Slot.CanStackWith(Item))
 		{
 			TotalFound += Slot.Quantity;
 		}

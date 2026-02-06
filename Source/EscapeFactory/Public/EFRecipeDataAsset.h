@@ -9,7 +9,7 @@
 class UEFItemDataAsset;
 
 USTRUCT(BlueprintType)
-struct FEFRecipeIngredient
+struct FEFItemCount
 {
 	GENERATED_BODY()
 	
@@ -30,13 +30,10 @@ class ESCAPEFACTORY_API UEFRecipeDataAsset : public UPrimaryDataAsset
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Recipe")
-	TArray<FEFRecipeIngredient> Ingredients;
+	TArray<FEFItemCount> InputItem;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Recipe")
-	UEFItemDataAsset* OutputItem;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Recipe")
-	int32 OutputQuantity;
+	TArray<FEFItemCount> OutputItem;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Recipe")
 	float ProductionTime = 1.0f;
