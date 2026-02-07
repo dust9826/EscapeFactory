@@ -1,0 +1,76 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "EscapeFactory.h"
+#include "GameFramework/Actor.h"
+#include "EFMachineBase.generated.h"
+
+class UEFInventoryComponent;
+class UEFRecipeDataAsset;
+struct FEFItemStack;
+
+UENUM(BlueprintType)
+enum class EEFMachineState : uint8
+{
+	SelectingRecipe    UMETA(DisplayName = "레시피 선택"),
+	Idle               UMETA(DisplayName = "대기"),
+	Working            UMETA(DisplayName = "작동"),
+	Paused             UMETA(DisplayName = "정지")
+};
+
+UCLASS()
+class ESCAPEFACTORY_API AEFMachineBase : public AActor
+{
+	GENERATED_BODY()
+	
+public:	
+	// Sets default values for this actor's properties
+	AEFMachineBase();
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+	
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+	
+protected:
+	void UpdateProduction(float DeltaTime);
+	
+	void SetupInventoryRecipe();
+	
+public:
+	UFUNCTION(BlueprintCallable, Category = "Machine State")
+	void SetMachineState(EEFMachineState NewState);
+
+	UFUNCTION(BlueprintCallable, Category = "Machine State")
+	void SelectRecipe(UEFRecipeDataAsset* NewRecipe);
+	
+private:
+	bool CanProcessRecipe();
+	void ConsumeIngredients();
+	void ProduceOutput();
+	void FlushRemainItems();
+	
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Production")
+	float CurrentProgress = 0.0f;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Production")
+	UEFRecipeDataAsset* CurrentRecipe;
+	
+	UPROPERTY(VisibleAnywhere, Category = "Production")
+	TArray<FEFItemStack> RemainItems;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
+	UEFInventoryComponent* InputInventory;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
+	UEFInventoryComponent* OutputInventory;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Machine State")
+	EEFMachineState CurrentState = EEFMachineState::SelectingRecipe;
+	
+};

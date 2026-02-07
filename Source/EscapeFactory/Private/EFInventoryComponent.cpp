@@ -4,6 +4,7 @@
 #include "EFInventoryComponent.h"
 
 #include "EFItemDataAsset.h"
+#include "EFRecipeDataAsset.h"
 
 // Sets default values for this component's properties
 UEFInventoryComponent::UEFInventoryComponent()
@@ -110,6 +111,28 @@ bool UEFInventoryComponent::HasEnoughItem(FEFItemInstance& Item, int32 Amount)
 		}
 	}
 	return TotalFound >= Amount;
+}
+
+void UEFInventoryComponent::SetupRecipe(TArray<FEFItemCount> ItemCounts)
+{
+	int recipeSize = ItemCounts.Num();
+
+	EFCHECK(recipeSize <= MaxSlots);
+	for (int i = 0; i < recipeSize; i++)
+	{
+		Slots[i].Item.ItemData = ItemCounts[i].ItemData;
+		Slots[i].Quantity = 0;
+		Slots[i].bIsLocked = true;
+	}
+	
+	for (int i = recipeSize; i < MaxSlots; i++)
+	{
+		Slots[i].Item.ItemData = nullptr;
+		Slots[i].Quantity = 0;
+		Slots[i].bIsLocked = true;
+	}
+	
+	EFLOG(Warning, TEXT("This Function Force Slots Quantity to Zero. Check Later"));
 }
 
 

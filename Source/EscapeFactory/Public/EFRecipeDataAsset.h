@@ -18,6 +18,8 @@ struct FEFItemCount
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 Quantity;
+	
+	FEFItemCount() : ItemData(nullptr), Quantity(0) {}
 };
 
 /**
