@@ -31,6 +31,9 @@ protected:
 	/** Set up input action bindings */
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 	
+private:
+	void PerformInteractionCheck();
+	
 protected:
 
 	/** Called from Input Actions for movement input */
@@ -39,6 +42,8 @@ protected:
 	/** Called from Input Actions for looking input */
 	void LookInput(const FInputActionValue& Value);
 
+	void InteractionInput(const FInputActionValue& Value);
+	
 	/** Handles aim inputs from either controls or UI interfaces */
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoAim(float Yaw, float Pitch);
@@ -54,6 +59,9 @@ protected:
 	/** Handles jump end inputs from either controls or UI interfaces */
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoJumpEnd();
+	
+	UFUNCTION(BlueprintCallable, Category="Input")
+	virtual void DoInteraction();
 
 protected:
 
@@ -73,6 +81,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category ="Input")
 	class UInputAction* MouseLookAction;
 	
+	UPROPERTY(EditAnywhere, Category ="Input")
+	class UInputAction* InteractionAction;
+
 private:
 	
 	/** Pawn mesh: first person view (arms; seen only by self) */

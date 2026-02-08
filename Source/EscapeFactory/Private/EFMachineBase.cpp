@@ -36,7 +36,12 @@ void AEFMachineBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	UpdateProduction(DeltaTime);
 }
-	
+
+void AEFMachineBase::Interact(AActor* Interactor)
+{
+	EFLOG(Warning, TEXT("Machine Interacted by %s"), *Interactor->GetName());
+}
+
 void AEFMachineBase::UpdateProduction(float DeltaTime)
 {
 	switch (CurrentState)

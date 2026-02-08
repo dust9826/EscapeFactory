@@ -4,6 +4,7 @@
 
 #include "EscapeFactory.h"
 #include "GameFramework/Actor.h"
+#include "EFInteractable.h"
 #include "EFMachineBase.generated.h"
 
 class UEFInventoryComponent;
@@ -20,7 +21,7 @@ enum class EEFMachineState : uint8
 };
 
 UCLASS()
-class ESCAPEFACTORY_API AEFMachineBase : public AActor
+class ESCAPEFACTORY_API AEFMachineBase : public AActor, public IEFInteractable
 {
 	GENERATED_BODY()
 	
@@ -35,6 +36,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	virtual void Interact(AActor* Interactor) override;
 	
 protected:
 	void UpdateProduction(float DeltaTime);

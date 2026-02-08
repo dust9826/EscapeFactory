@@ -3,6 +3,7 @@
 
 #include "EFCharacter.h"
 
+#include "EFInteractable.h"
 #include "EFInventoryComponent.h"
 #include "EnhancedInputComponent.h"
 #include "Camera/CameraComponent.h"
@@ -63,6 +64,7 @@ void AEFCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	
 }
 
 // Called to bind functionality to input
@@ -83,10 +85,37 @@ void AEFCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		// Looking/Aiming
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AEFCharacter::LookInput);
 		EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &AEFCharacter::LookInput);
+		
+		// Interaction
+		EnhancedInputComponent->BindAction(InteractionAction, ETriggerEvent::Started, this, &AEFCharacter::DoInteraction);
 	}
 	else
 	{
 		EFLOG(Error, TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
+	}
+}
+
+void AEFCharacter::PerformInteractionCheck()
+{
+	FVector Start = GetPawnViewLocation(); // 카메라 위치
+	FVector End = Start + (GetViewRotation().Vector() * 500.0f); // 5m 앞까지
+
+	FHitResult HitResult;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	
+	EFLOG(Warning, TEXT("From %s To %s"), *Start.ToString(), *End.ToString());
+
+	// LineTrace 수행 (ECC_Visibility 채널 사용)
+	if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params))
+	{
+		// 충돌한 액터가 상호작용 인터페이스를 가지고 있는지 확인
+		IEFInteractable* Interactable = Cast<IEFInteractable>(HitResult.GetActor());
+		if (Interactable)
+		{
+			// E키를 눌렀을 때 실행하거나, 매 프레임 Focused 효과를 줄 수 있음
+			Interactable->Interact(this);
+		}
 	}
 }
 
@@ -108,6 +137,11 @@ void AEFCharacter::LookInput(const FInputActionValue& Value)
 	// pass the axis values to the aim input
 	DoAim(LookAxisVector.X, LookAxisVector.Y);
 
+}
+
+void AEFCharacter::InteractionInput(const FInputActionValue& Value)
+{
+	DoInteraction();
 }
 
 void AEFCharacter::DoAim(float Yaw, float Pitch)
@@ -140,5 +174,10 @@ void AEFCharacter::DoJumpEnd()
 {
 	// pass StopJumping to the character
 	StopJumping();
+}
+
+void AEFCharacter::DoInteraction()
+{
+	PerformInteractionCheck();
 }
 
