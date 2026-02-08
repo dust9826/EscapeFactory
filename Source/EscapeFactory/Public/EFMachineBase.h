@@ -70,7 +70,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
 	UEFInventoryComponent* OutputInventory;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Machine State")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Machine | State")
 	EEFMachineState CurrentState = EEFMachineState::SelectingRecipe;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Machine | Layout")
+	FIntPoint GridSize = FIntPoint(3, 3); // 기본값 3x3
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Machine")
+	UStaticMeshComponent* StaticMesh; // 기본값 3x3
+		
 };
