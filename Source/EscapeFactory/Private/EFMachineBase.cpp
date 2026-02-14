@@ -42,6 +42,11 @@ void AEFMachineBase::Interact(AActor* Interactor)
 	EFLOG(Warning, TEXT("Machine Interacted by %s"), *Interactor->GetName());
 }
 
+FString AEFMachineBase::GetInteractName() const
+{
+	return MachineName.IsEmpty() ? GetClass()->GetName() : MachineName;;
+}
+
 void AEFMachineBase::UpdateProduction(float DeltaTime)
 {
 	switch (CurrentState)

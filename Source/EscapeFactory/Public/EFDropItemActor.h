@@ -21,6 +21,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void Interact(AActor* Interactor) override;
+	virtual FString GetInteractName() const override;
 	
 public:
 	void InitializeDrop(const FEFItemStack& InStack);

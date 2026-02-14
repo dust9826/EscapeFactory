@@ -18,6 +18,8 @@ class ESCAPEFACTORY_API IEFInteractable
 public:
 	virtual void Interact(AActor* Interactor) = 0;
 	
+	virtual FString GetInteractName() const = 0;
+	
 	virtual void OnFocused() {}
 	virtual void OnUnFocused() {}
 };

@@ -37,6 +37,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	virtual void Interact(AActor* Interactor) override;
+	virtual FString GetInteractName() const override;
 	
 protected:
 	void UpdateProduction(float DeltaTime);
@@ -80,5 +81,7 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Machine")
 	UStaticMeshComponent* StaticMesh; // 기본값 3x3
-		
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Machine")
+	FString MachineName;
 };

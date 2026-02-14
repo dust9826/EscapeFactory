@@ -38,6 +38,7 @@ public:
 	// Machine 레시피 고정에 필요. 상속으로 빼도 될듯.
 	void SetupRecipe(TArray<FEFItemCount> ItemCounts);
 	
+	const TArray<FEFItemStack>& GetSlots();
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")

@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "EFCharacter.generated.h"
 
+class UEFInteractionWidget;
 class UEFInventoryComponent;
 class UInputComponent;
 class USkeletalMeshComponent;
@@ -33,6 +34,7 @@ protected:
 	
 private:
 	void PerformInteractionCheck();
+	void InteractionCheck();
 	
 protected:
 
@@ -43,6 +45,8 @@ protected:
 	void LookInput(const FInputActionValue& Value);
 
 	void InteractionInput(const FInputActionValue& Value);
+	
+	void InventoryInput(const FInputActionValue& Value);
 	
 	/** Handles aim inputs from either controls or UI interfaces */
 	UFUNCTION(BlueprintCallable, Category="Input")
@@ -63,6 +67,9 @@ protected:
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoInteraction();
 
+	UFUNCTION(BlueprintCallable, Category="Input")
+	virtual void DoInventoryOpen();
+	
 protected:
 
 	/** Jump Input Action */
@@ -84,6 +91,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category ="Input")
 	class UInputAction* InteractionAction;
 
+	UPROPERTY(EditAnywhere, Category ="Input")
+	class UInputAction* InventoryAction;
+	
 private:
 	
 	/** Pawn mesh: first person view (arms; seen only by self) */
@@ -96,6 +106,12 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UEFInventoryComponent* InventoryComponent;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UI", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UEFInteractionWidget> InteractionWidgetClass;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="UI", meta = (AllowPrivateAccess = "true"))
+	UEFInteractionWidget* InteractionWidget;
 	
 public:
 

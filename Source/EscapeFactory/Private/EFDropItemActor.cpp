@@ -51,6 +51,15 @@ void AEFDropItemActor::Interact(AActor* Interactor)
 	}
 }
 
+FString AEFDropItemActor::GetInteractName() const
+{
+	EFCHECK(!ItemStack.IsEmpty(), "No Item");
+	FString InteractName = FString::Printf(TEXT("%s(%d)"),
+		*ItemStack.Item.ItemData->ItemName.ToString(), ItemStack.Quantity);
+	
+	return InteractName;
+}
+
 void AEFDropItemActor::InitializeDrop(const FEFItemStack& InStack)
 {
 	ItemStack = InStack;

@@ -41,6 +41,7 @@ int32 UEFInventoryComponent::AddItem(FEFItemInstance& Item, int32 Amount)
 	{
 		if (Slot.CanStackWith(Item))
 		{
+			
 			int32 Addable = Item.ItemData->MaxStackSize - Slot.Quantity;
 			int32 ToAdd = FMath::Min(Addable, Amount);
 			
@@ -133,6 +134,11 @@ void UEFInventoryComponent::SetupRecipe(TArray<FEFItemCount> ItemCounts)
 	}
 	
 	EFLOG(Warning, TEXT("This Function Force Slots Quantity to Zero. Check Later"));
+}
+
+const TArray<FEFItemStack>& UEFInventoryComponent::GetSlots()
+{
+	return Slots;
 }
 
 

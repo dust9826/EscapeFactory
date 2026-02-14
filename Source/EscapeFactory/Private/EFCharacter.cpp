@@ -4,7 +4,9 @@
 #include "EFCharacter.h"
 
 #include "EFInteractable.h"
+#include "EFInteractionWidget.h"
 #include "EFInventoryComponent.h"
+#include "EFPlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -56,7 +58,13 @@ void AEFCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
-
+	EFCHECK(nullptr != InteractionWidgetClass);
+	
+	InteractionWidget = CreateWidget<UEFInteractionWidget>(GetWorld(), InteractionWidgetClass);
+	EFCHECK(nullptr != InteractionWidget);
+	
+	InteractionWidget->AddToViewport();
+	InteractionWidget->SetVisibility(ESlateVisibility::Hidden);
 }
 
 // Called every frame
@@ -64,7 +72,7 @@ void AEFCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	
+	InteractionCheck();
 }
 
 // Called to bind functionality to input
@@ -88,6 +96,9 @@ void AEFCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		
 		// Interaction
 		EnhancedInputComponent->BindAction(InteractionAction, ETriggerEvent::Started, this, &AEFCharacter::DoInteraction);
+		
+		// Inventory
+		EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Started, this, &AEFCharacter::DoInventoryOpen);
 	}
 	else
 	{
@@ -119,6 +130,42 @@ void AEFCharacter::PerformInteractionCheck()
 	}
 }
 
+void AEFCharacter::InteractionCheck()
+{
+	FVector Start = GetPawnViewLocation(); // 카메라 위치
+	FVector End = Start + (GetViewRotation().Vector() * 500.0f); // 5m 앞까지
+
+	FHitResult HitResult;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	
+	// LineTrace 수행 (ECC_Visibility 채널 사용)
+	if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params))
+	{
+		// 충돌한 액터가 상호작용 인터페이스를 가지고 있는지 확인
+		IEFInteractable* Interactable = Cast<IEFInteractable>(HitResult.GetActor());
+		if (Interactable)
+		{
+			// E키를 눌렀을 때 실행하거나, 매 프레임 Focused 효과를 줄 수 있음
+			FString InteractName = Interactable->GetInteractName();
+			
+			EFCHECK(nullptr != InteractionWidget);
+			InteractionWidget->SetInteractionName(InteractName);
+			InteractionWidget->SetVisibility(ESlateVisibility::HitTestInvisible);
+		}
+		else
+		{
+			EFCHECK(nullptr != InteractionWidget);
+			InteractionWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
+	else
+	{
+		EFCHECK(nullptr != InteractionWidget);
+		InteractionWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
 void AEFCharacter::MoveInput(const FInputActionValue& Value)
 {
 	// get the Vector2D move axis
@@ -142,6 +189,19 @@ void AEFCharacter::LookInput(const FInputActionValue& Value)
 void AEFCharacter::InteractionInput(const FInputActionValue& Value)
 {
 	DoInteraction();
+}
+
+void AEFCharacter::InventoryInput(const FInputActionValue& Value)
+{
+	DoInventoryOpen();
+}
+
+void AEFCharacter::DoInventoryOpen()
+{
+	if (AEFPlayerController* PC = Cast<AEFPlayerController>(GetController()))
+	{
+		PC->ToggleInventory();
+	}
 }
 
 void AEFCharacter::DoAim(float Yaw, float Pitch)
