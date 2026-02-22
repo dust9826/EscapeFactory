@@ -80,6 +80,7 @@ void AEFPlayerController::ChangeUIState(EEFUIState NewState)
 	{
 	case EEFUIState::None:
 		{
+			SetIgnoreLookInput(false); 
 			SetShowMouseCursor(false);
 			SetInputMode(FInputModeGameOnly());
 
@@ -88,9 +89,12 @@ void AEFPlayerController::ChangeUIState(EEFUIState NewState)
 		}
 	case EEFUIState::Inventory:
 		{
+			SetIgnoreLookInput(true); 
 			SetShowMouseCursor(true);
 			FInputModeGameAndUI InputMode;
+			InputMode.SetHideCursorDuringCapture(false);
 			InputMode.SetWidgetToFocus(PlayerMenuWidget->TakeWidget());
+			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 			SetInputMode(InputMode);
 			
 			UpdatePlayerInventory();
@@ -100,9 +104,12 @@ void AEFPlayerController::ChangeUIState(EEFUIState NewState)
 		}
 	case EEFUIState::MachineMenu:
 		{
+			SetIgnoreLookInput(true); 
 			SetShowMouseCursor(true);
 			FInputModeGameAndUI InputMode;
+			InputMode.SetHideCursorDuringCapture(false);
 			InputMode.SetWidgetToFocus(PlayerMenuWidget->TakeWidget());
+			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 			SetInputMode(InputMode);
 			
 			MachineMenuWidget->SetVisibility(ESlateVisibility::Visible);
