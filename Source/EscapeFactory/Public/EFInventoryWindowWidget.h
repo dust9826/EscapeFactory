@@ -26,5 +26,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	int32 SlotsPerRow = 5;
 	
-	void RefreshInventory(const UEFInventoryComponent* InventoryComponent);
+	void RefreshInventory(UEFInventoryComponent* InventoryComponent);
+	
 };

@@ -58,13 +58,13 @@ private:
 	void FlushRemainItems();
 	
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Production")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Machine | Production")
 	float CurrentProgress = 0.0f;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Production")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Machine | Production")
 	UEFRecipeDataAsset* CurrentRecipe;
 	
-	UPROPERTY(VisibleAnywhere, Category = "Production")
+	UPROPERTY(VisibleAnywhere, Category = "Machine | Production")
 	TArray<FEFItemStack> RemainItems;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
@@ -73,7 +73,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
 	UEFInventoryComponent* OutputInventory;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Machine | State")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Machine | State")
 	EEFMachineState CurrentState = EEFMachineState::SelectingRecipe;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Machine | Layout")
@@ -86,7 +86,7 @@ protected:
 	FString MachineName;
 	
 public:
-	const UEFInventoryComponent* GetInputInventoryComponent() {return InputInventory;}
-	const UEFInventoryComponent* GetOutputInventoryComponent() {return OutputInventory;}
+	UEFInventoryComponent* GetInputInventoryComponent() { return InputInventory; }
+	UEFInventoryComponent* GetOutputInventoryComponent() { return OutputInventory; }
 	
 };

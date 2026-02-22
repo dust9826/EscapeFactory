@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "EFPlayerController.generated.h"
 
+class UEFInventorySlotWidget;
+class UEFInventoryComponent;
 class UEFMachineMenuWidget;
 class AEFMachineBase;
 class UEFInteractionWidget;
@@ -52,6 +54,15 @@ public:
 	
 	void UpdateMachineMenu(AEFMachineBase* MachineBase);
 	
+	void HandleQuickMove(UEFInventoryComponent* SourceInv, int32 SlotIndex);
+		
+	void SwapSlot(UEFInventorySlotWidget* Slot1, UEFInventorySlotWidget* Slot2);
+	
+	void MoveSlot(UEFInventorySlotWidget* FromSlot, UEFInventorySlotWidget* ToSlot);
+	
+private:
+	UEFInventoryComponent* FindDestinationInventory(UEFInventoryComponent* SourceInv);
+	
 public:
 	
 	/** Input Mapping Contexts */
@@ -77,5 +88,19 @@ public:
 	UEFMachineMenuWidget* MachineMenuWidget;
 	
 private:
+	UPROPERTY()
+	AEFMachineBase* CurrentTargetMachine;
+	
+	UPROPERTY()
+	UEFInventoryComponent* CurrentInventoryComponent;
+
+	UPROPERTY(EditAnywhere, Category="UI")
+	UEFInventorySlotWidget* SelectedSlot;
+	
 	EEFUIState CurrentUIState = EEFUIState::None;
+	
+public:
+	UEFInventorySlotWidget* GetSelectedSlot() { return SelectedSlot; }
+	void SetSelectedSlot(UEFInventorySlotWidget* slot) { SelectedSlot = slot; }
+	
 };

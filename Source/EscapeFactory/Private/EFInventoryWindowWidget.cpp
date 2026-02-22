@@ -8,7 +8,7 @@
 #include "Components/UniformGridPanel.h"
 #include "Components/UniformGridSlot.h"
 
-void UEFInventoryWindowWidget::RefreshInventory(const UEFInventoryComponent* InventoryComponent)
+void UEFInventoryWindowWidget::RefreshInventory(UEFInventoryComponent* InventoryComponent)
 {
 	EFCHECK(nullptr != ItemGrid);
 	ItemGrid->ClearChildren();
@@ -22,6 +22,7 @@ void UEFInventoryWindowWidget::RefreshInventory(const UEFInventoryComponent* Inv
 		UEFInventorySlotWidget* NewSlot = CreateWidget<UEFInventorySlotWidget>(this, SlotWidgetClass);
 		if (NewSlot)
 		{
+			NewSlot->SetupSlot(InventoryComponent, i);
 			// 데이터 주입 (아까 만든 UpdateSlot 호출)
 			NewSlot->UpdateSlot(InventorySlots[i]);
 

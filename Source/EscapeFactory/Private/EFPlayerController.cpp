@@ -5,7 +5,10 @@
 
 #include "EFCharacter.h"
 #include "EFInteractionWidget.h"
+#include "EFInventoryComponent.h"
+#include "EFInventorySlotWidget.h"
 #include "EFInventoryWindowWidget.h"
+#include "EFItemDataAsset.h"
 #include "EFMachineBase.h"
 #include "EFMachineMenuWidget.h"
 #include "EFPlayerMenuWidget.h"
@@ -108,9 +111,11 @@ void AEFPlayerController::ChangeUIState(EEFUIState NewState)
 			SetShowMouseCursor(true);
 			FInputModeGameAndUI InputMode;
 			InputMode.SetHideCursorDuringCapture(false);
-			InputMode.SetWidgetToFocus(PlayerMenuWidget->TakeWidget());
+			InputMode.SetWidgetToFocus(MachineMenuWidget->TakeWidget());
 			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 			SetInputMode(InputMode);
+			
+			UpdatePlayerInventory();
 			
 			MachineMenuWidget->SetVisibility(ESlateVisibility::Visible);
 			break;
@@ -125,6 +130,7 @@ void AEFPlayerController::UpdatePlayerInventory()
 		if (AEFCharacter* EFChar = Cast<AEFCharacter>(GetPawn()))
 		{
 			PlayerMenuWidget->PlayerInventoryWidget->RefreshInventory(EFChar->GetInventoryComponent());
+			CurrentInventoryComponent = EFChar->GetInventoryComponent();
 		}
 	}
 }
@@ -135,7 +141,51 @@ void AEFPlayerController::UpdateMachineMenu(AEFMachineBase* MachineBase)
 	{
 		MachineMenuWidget->RefreshInventorys(EFChar->GetInventoryComponent(), 
 			MachineBase->GetInputInventoryComponent(), MachineBase->GetOutputInventoryComponent());
+		CurrentTargetMachine = MachineBase;
 	}
+}
+
+void AEFPlayerController::HandleQuickMove(class UEFInventoryComponent* SourceInv, int32 SlotIndex)
+{
+	if (CurrentUIState == EEFUIState::MachineMenu)
+	{
+		EFCHECK(nullptr != SourceInv);
+	
+		UEFInventoryComponent* DestinationInv = FindDestinationInventory(SourceInv);
+		EFCHECK(nullptr != DestinationInv);
+	
+		FEFItemStack& ItemStack = SourceInv->GetSlots()[SlotIndex];
+	
+		DestinationInv->AddItem(ItemStack);
+		
+		UpdateMachineMenu(CurrentTargetMachine);
+	}
+}
+
+void AEFPlayerController::SwapSlot(UEFInventorySlotWidget* Slot1, UEFInventorySlotWidget* Slot2)
+{
+	EFLOG(Warning, TEXT("SwapSlot"));
+}
+
+void AEFPlayerController::MoveSlot(UEFInventorySlotWidget* FromSlot, UEFInventorySlotWidget* ToSlot)
+{
+	FEFItemStack& FromItemStack = FromSlot->GetItemStack();
+	ToSlot->GetSourceInventory()->AddItem(FromItemStack, ToSlot->GetSlotIndex());
+	EFLOG(Warning, TEXT("MoveSlot"));
+}
+
+UEFInventoryComponent* AEFPlayerController::FindDestinationInventory(UEFInventoryComponent* SourceInv)
+{
+	if (SourceInv == CurrentInventoryComponent)
+	{
+		return CurrentTargetMachine->GetInputInventoryComponent();
+	}
+	if (SourceInv == CurrentTargetMachine->GetInputInventoryComponent() ||
+		SourceInv == CurrentTargetMachine->GetOutputInventoryComponent())
+	{
+		return CurrentInventoryComponent;
+	}
+	return nullptr;
 }
 
 void AEFPlayerController::UpdateInteractionName(FString NewName)

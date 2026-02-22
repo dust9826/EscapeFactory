@@ -41,7 +41,6 @@ int32 UEFInventoryComponent::AddItem(FEFItemInstance& Item, int32 Amount)
 	{
 		if (Slot.CanStackWith(Item))
 		{
-			
 			int32 Addable = Item.ItemData->MaxStackSize - Slot.Quantity;
 			int32 ToAdd = FMath::Min(Addable, Amount);
 			
@@ -74,6 +73,34 @@ int32 UEFInventoryComponent::AddItem(FEFItemInstance& Item, int32 Amount)
 	}
 	
 	return Amount;
+}
+
+void UEFInventoryComponent::AddItem(FEFItemStack& Item)
+{
+	int32 ret = AddItem(Item.Item, Item.Quantity);
+	Item.Quantity = ret;
+}
+
+void UEFInventoryComponent::AddItem(FEFItemStack& Item, int32 SlotIndex)
+{
+	FEFItemStack& Slot = Slots[SlotIndex];
+
+	if (Slot.CanStackWith(Item))
+	{
+		int32 Addable = Item.Item.ItemData->MaxStackSize - Slot.Quantity;
+		int32 ToAdd = FMath::Min(Addable, Item.Quantity);
+			
+		Slot.Quantity += ToAdd;
+		Item.Quantity -= ToAdd;
+	}
+	else if (Slot.IsEmpty() && !Slot.bIsLocked)
+	{
+		Slot.Item.ItemData = Item.Item.ItemData;
+		int32 ToAdd = FMath::Min(Item.Item.ItemData->MaxStackSize, Item.Quantity);
+			
+		Slot.Quantity += ToAdd;
+		Item.Quantity -= ToAdd;
+	}
 }
 
 bool UEFInventoryComponent::RemoveItem(FEFItemInstance& Item, int32 Amount)
@@ -136,7 +163,7 @@ void UEFInventoryComponent::SetupRecipe(TArray<FEFItemCount> ItemCounts)
 	EFLOG(Warning, TEXT("This Function Force Slots Quantity to Zero. Check Later"));
 }
 
-const TArray<FEFItemStack>& UEFInventoryComponent::GetSlots() const 
+TArray<FEFItemStack>& UEFInventoryComponent::GetSlots() 
 {
 	return Slots;
 }

@@ -5,8 +5,8 @@
 
 #include "EFInventoryWindowWidget.h"
 
-void UEFMachineMenuWidget::RefreshInventorys(const UEFInventoryComponent* PlayerInven, const UEFInventoryComponent* InputInven,
-	const UEFInventoryComponent* OutputInven)
+void UEFMachineMenuWidget::RefreshInventorys(UEFInventoryComponent* PlayerInven, UEFInventoryComponent* InputInven,
+	UEFInventoryComponent* OutputInven)
 {
 	PlayerInventoryWidget->RefreshInventory(PlayerInven);
 	MachineInputInventoryWidget->RefreshInventory(InputInven);

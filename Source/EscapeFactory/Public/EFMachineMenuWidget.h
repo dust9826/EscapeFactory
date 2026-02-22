@@ -28,6 +28,6 @@ protected:
 	UEFInventoryWindowWidget* MachineOutputInventoryWidget;
 	
 public:
-	void RefreshInventorys(const UEFInventoryComponent* PlayerInven,
-		const UEFInventoryComponent* InputInven, const UEFInventoryComponent* OutputInven);
+	void RefreshInventorys(UEFInventoryComponent* PlayerInven,
+		UEFInventoryComponent* InputInven, UEFInventoryComponent* OutputInven);
 };
