@@ -5,6 +5,7 @@
 
 #include "EFInventoryComponent.h"
 #include "EFItemDataAsset.h"
+#include "EFPlayerController.h"
 #include "EFRecipeDataAsset.h"
 
 
@@ -19,6 +20,9 @@ AEFMachineBase::AEFMachineBase()
 	
 	InputInventory = CreateDefaultSubobject<UEFInventoryComponent>(FName("InputInventory"));
 	OutputInventory = CreateDefaultSubobject<UEFInventoryComponent>(FName("OutputInventory"));
+	
+	InputInventory->SetMaxSlots(3);
+	OutputInventory->SetMaxSlots(1);
 	
 	SetMachineState(EEFMachineState::SelectingRecipe);
 }
@@ -40,6 +44,12 @@ void AEFMachineBase::Tick(float DeltaTime)
 void AEFMachineBase::Interact(AActor* Interactor)
 {
 	EFLOG(Warning, TEXT("Machine Interacted by %s"), *Interactor->GetName());
+	
+	AEFPlayerController* PC = Cast<AEFPlayerController>(Interactor->GetInstigatorController());
+	EFCHECK(nullptr != PC);
+	
+	PC->UpdateMachineMenu(this);
+	PC->ChangeUIState(EEFUIState::MachineMenu);
 }
 
 FString AEFMachineBase::GetInteractName() const

@@ -6,8 +6,9 @@
 #include "EFInventoryComponent.h"
 #include "EFInventorySlotWidget.h"
 #include "Components/UniformGridPanel.h"
+#include "Components/UniformGridSlot.h"
 
-void UEFInventoryWindowWidget::RefreshInventory(UEFInventoryComponent* InventoryComponent)
+void UEFInventoryWindowWidget::RefreshInventory(const UEFInventoryComponent* InventoryComponent)
 {
 	EFCHECK(nullptr != ItemGrid);
 	ItemGrid->ClearChildren();
@@ -28,7 +29,13 @@ void UEFInventoryWindowWidget::RefreshInventory(UEFInventoryComponent* Inventory
 			int32 Row = i / SlotsPerRow;
 			int32 Column = i % SlotsPerRow;
 
-			ItemGrid->AddChildToUniformGrid(NewSlot, Row, Column);
+			UUniformGridSlot* NewGridSlot = ItemGrid->AddChildToUniformGrid(NewSlot, Row, Column);
+			
+			if (NewGridSlot)
+			{
+				NewGridSlot->SetHorizontalAlignment(HAlign_Center);
+				NewGridSlot->SetVerticalAlignment(VAlign_Center);
+			}
 		}
 	}
 }

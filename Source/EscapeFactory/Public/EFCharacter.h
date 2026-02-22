@@ -107,12 +107,6 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UEFInventoryComponent* InventoryComponent;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UI", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<UEFInteractionWidget> InteractionWidgetClass;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="UI", meta = (AllowPrivateAccess = "true"))
-	UEFInteractionWidget* InteractionWidget;
-	
 public:
 
 	/** Returns the first person mesh **/

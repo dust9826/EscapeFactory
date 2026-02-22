@@ -4,7 +4,11 @@
 #include "EFPlayerController.h"
 
 #include "EFCharacter.h"
+#include "EFInteractionWidget.h"
 #include "EFInventoryWindowWidget.h"
+#include "EFMachineBase.h"
+#include "EFMachineMenuWidget.h"
+#include "EFPlayerMenuWidget.h"
 #include "EnhancedInputSubsystems.h"
 #include "EscapeFactoryCameraManager.h"
 
@@ -17,6 +21,26 @@ AEFPlayerController::AEFPlayerController()
 void AEFPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	EFCHECK(nullptr != InteractionWidgetClass);
+	InteractionWidget = CreateWidget<UEFInteractionWidget>(this, InteractionWidgetClass);
+	EFCHECK(nullptr != InteractionWidget);
+	InteractionWidget->AddToViewport();
+	InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
+	
+	EFCHECK(nullptr != PlayerMenuWidgetClass);
+	PlayerMenuWidget = CreateWidget<UEFPlayerMenuWidget>(this, PlayerMenuWidgetClass);
+	EFCHECK(nullptr != PlayerMenuWidget);
+	PlayerMenuWidget->AddToViewport();
+	PlayerMenuWidget->SetVisibility(ESlateVisibility::Collapsed);
+	
+	EFCHECK(nullptr != MachineMenuWidgetClass);
+	MachineMenuWidget = CreateWidget<UEFMachineMenuWidget>(this, MachineMenuWidgetClass);
+	EFCHECK(nullptr != MachineMenuWidget);
+	MachineMenuWidget->AddToViewport();
+	MachineMenuWidget->SetVisibility(ESlateVisibility::Collapsed);
+	
+	ChangeUIState(EEFUIState::None);
 }
 
 void AEFPlayerController::SetupInputComponent()
@@ -37,46 +61,77 @@ void AEFPlayerController::SetupInputComponent()
 	}
 }
 
-void AEFPlayerController::ToggleInventory()
+void AEFPlayerController::ChangeUIState(EEFUIState NewState)
 {
-	if (!bInventoryOpen)
-    {
-        // 1. 위젯 생성 및 뷰포트 추가
-        if (!InventoryUI && InventoryWidgetClass)
-        {
-            InventoryUI = CreateWidget<UEFInventoryWindowWidget>(this, InventoryWidgetClass);
-        }
+	EFCHECK(nullptr != InteractionWidget);
+	EFCHECK(nullptr != PlayerMenuWidget);
+	EFCHECK(nullptr != MachineMenuWidget);
+	
+	PlayerMenuWidget->SetVisibility(ESlateVisibility::Collapsed);
+	InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
+	MachineMenuWidget->SetVisibility(ESlateVisibility::Collapsed);		
+	
+	if (CurrentUIState == NewState)
+		CurrentUIState = EEFUIState::None;
+	else
+		CurrentUIState = NewState;
+	
+	switch (CurrentUIState)
+	{
+	case EEFUIState::None:
+		{
+			SetShowMouseCursor(false);
+			SetInputMode(FInputModeGameOnly());
 
-        if (InventoryUI)
-        {
-            InventoryUI->AddToViewport();
+			InteractionWidget->SetVisibility(ESlateVisibility::Visible);
+			break;
+		}
+	case EEFUIState::Inventory:
+		{
+			SetShowMouseCursor(true);
+			FInputModeGameAndUI InputMode;
+			InputMode.SetWidgetToFocus(PlayerMenuWidget->TakeWidget());
+			SetInputMode(InputMode);
+			
+			UpdatePlayerInventory();
+			
+			PlayerMenuWidget->SetVisibility(ESlateVisibility::Visible);
+			break;
+		}
+	case EEFUIState::MachineMenu:
+		{
+			SetShowMouseCursor(true);
+			FInputModeGameAndUI InputMode;
+			InputMode.SetWidgetToFocus(PlayerMenuWidget->TakeWidget());
+			SetInputMode(InputMode);
+			
+			MachineMenuWidget->SetVisibility(ESlateVisibility::Visible);
+			break;
+		}
+	}
+}
 
-            // 2. 캐릭터의 인벤토리 데이터 주입 (캐릭터를 가져와서 컴포넌트 전달)
-            if (AEFCharacter* EFChar = Cast<AEFCharacter>(GetPawn()))
-            {
-                InventoryUI->RefreshInventory(EFChar->GetInventoryComponent());
-            }
+void AEFPlayerController::UpdatePlayerInventory()
+{
+	if (PlayerMenuWidget)
+	{
+		if (AEFCharacter* EFChar = Cast<AEFCharacter>(GetPawn()))
+		{
+			PlayerMenuWidget->PlayerInventoryWidget->RefreshInventory(EFChar->GetInventoryComponent());
+		}
+	}
+}
 
-            // 3. 마우스 커서 활성화 및 입력 모드 전환
-            SetShowMouseCursor(true);
-            FInputModeGameAndUI InputMode;
-            InputMode.SetWidgetToFocus(InventoryUI->TakeWidget());
-            SetInputMode(InputMode);
-            
-            bInventoryOpen = true;
-        }
-    }
-    else
-    {
-        // 4. UI 닫기 및 입력 모드 복구
-        if (InventoryUI)
-        {
-            InventoryUI->RemoveFromParent();
-        }
+void AEFPlayerController::UpdateMachineMenu(AEFMachineBase* MachineBase)
+{
+	if (AEFCharacter* EFChar = Cast<AEFCharacter>(GetPawn()))
+	{
+		MachineMenuWidget->RefreshInventorys(EFChar->GetInventoryComponent(), 
+			MachineBase->GetInputInventoryComponent(), MachineBase->GetOutputInventoryComponent());
+	}
+}
 
-        SetShowMouseCursor(false);
-        SetInputMode(FInputModeGameOnly());
-        
-        bInventoryOpen = false;
-    }
+void AEFPlayerController::UpdateInteractionName(FString NewName)
+{
+	InteractionWidget->SetInteractionName(NewName);
 }

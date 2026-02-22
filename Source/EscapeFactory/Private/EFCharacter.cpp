@@ -57,14 +57,6 @@ AEFCharacter::AEFCharacter()
 void AEFCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	EFCHECK(nullptr != InteractionWidgetClass);
-	
-	InteractionWidget = CreateWidget<UEFInteractionWidget>(GetWorld(), InteractionWidgetClass);
-	EFCHECK(nullptr != InteractionWidget);
-	
-	InteractionWidget->AddToViewport();
-	InteractionWidget->SetVisibility(ESlateVisibility::Hidden);
 }
 
 // Called every frame
@@ -132,6 +124,9 @@ void AEFCharacter::PerformInteractionCheck()
 
 void AEFCharacter::InteractionCheck()
 {
+	AEFPlayerController* PC = Cast<AEFPlayerController>(GetController());
+	EFCHECK(nullptr != PC);
+	
 	FVector Start = GetPawnViewLocation(); // 카메라 위치
 	FVector End = Start + (GetViewRotation().Vector() * 500.0f); // 5m 앞까지
 
@@ -148,21 +143,17 @@ void AEFCharacter::InteractionCheck()
 		{
 			// E키를 눌렀을 때 실행하거나, 매 프레임 Focused 효과를 줄 수 있음
 			FString InteractName = Interactable->GetInteractName();
-			
-			EFCHECK(nullptr != InteractionWidget);
-			InteractionWidget->SetInteractionName(InteractName);
-			InteractionWidget->SetVisibility(ESlateVisibility::HitTestInvisible);
+						
+			PC->UpdateInteractionName(InteractName);
 		}
 		else
 		{
-			EFCHECK(nullptr != InteractionWidget);
-			InteractionWidget->SetVisibility(ESlateVisibility::Hidden);
+			PC->UpdateInteractionName(TEXT(""));
 		}
 	}
 	else
 	{
-		EFCHECK(nullptr != InteractionWidget);
-		InteractionWidget->SetVisibility(ESlateVisibility::Hidden);
+		PC->UpdateInteractionName(TEXT(""));
 	}
 }
 
@@ -200,7 +191,7 @@ void AEFCharacter::DoInventoryOpen()
 {
 	if (AEFPlayerController* PC = Cast<AEFPlayerController>(GetController()))
 	{
-		PC->ToggleInventory();
+		PC->ChangeUIState(EEFUIState::Inventory);
 	}
 }
 

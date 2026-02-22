@@ -84,4 +84,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Machine")
 	FString MachineName;
+	
+public:
+	const UEFInventoryComponent* GetInputInventoryComponent() {return InputInventory;}
+	const UEFInventoryComponent* GetOutputInventoryComponent() {return OutputInventory;}
+	
 };

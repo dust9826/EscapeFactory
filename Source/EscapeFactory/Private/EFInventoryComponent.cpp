@@ -136,9 +136,14 @@ void UEFInventoryComponent::SetupRecipe(TArray<FEFItemCount> ItemCounts)
 	EFLOG(Warning, TEXT("This Function Force Slots Quantity to Zero. Check Later"));
 }
 
-const TArray<FEFItemStack>& UEFInventoryComponent::GetSlots()
+const TArray<FEFItemStack>& UEFInventoryComponent::GetSlots() const 
 {
 	return Slots;
+}
+
+void UEFInventoryComponent::SetMaxSlots(int32 Size)
+{
+	MaxSlots = Size;
 }
 
 
