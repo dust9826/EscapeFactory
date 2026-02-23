@@ -19,6 +19,8 @@ public:
 	
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	
+	void UpdatePosition();
+	
 public:
 	UPROPERTY(meta = (BindWidget))
 	class UImage* ItemIcon;

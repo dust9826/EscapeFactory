@@ -27,12 +27,19 @@ void UEFItemVisualWidget::UpdateVisual(UImage* Icon, FText Text)
 		AddToViewport(999); 
 	}
 	SetAlignmentInViewport(FVector2D(0.5f, 0.5f));
+	
+	UpdatePosition();
 }
 
 void UEFItemVisualWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
-	// 1. 현재 선택된 슬롯이 있는지 확인 (PC에서 가져옴)
+
+	UpdatePosition();
+}
+
+void UEFItemVisualWidget::UpdatePosition()
+{
 	AEFPlayerController* PC = Cast<AEFPlayerController>(GetOwningPlayer());
 	
 	if (PC)
