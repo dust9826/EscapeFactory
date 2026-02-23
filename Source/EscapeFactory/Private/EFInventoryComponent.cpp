@@ -37,8 +37,9 @@ int32 UEFInventoryComponent::AddItem(FEFItemInstance& Item, int32 Amount)
 	EFCHECK(nullptr != Item.ItemData || Amount <= 0, Amount);
 	
 	// 기존 스택에 추가 시도
-	for (FEFItemStack& Slot : Slots)
+	for (int i=0; i<Slots.Num(); i++)
 	{
+		FEFItemStack& Slot = Slots[i];
 		if (Slot.CanStackWith(Item))
 		{
 			int32 Addable = Item.ItemData->MaxStackSize - Slot.Quantity;
@@ -46,6 +47,8 @@ int32 UEFInventoryComponent::AddItem(FEFItemInstance& Item, int32 Amount)
 			
 			Slot.Quantity += ToAdd;
 			Amount -= ToAdd;
+			
+			OnItemChanged.Broadcast(i, Slot);
 			
 			if (Amount <= 0)
 			{
@@ -55,8 +58,9 @@ int32 UEFInventoryComponent::AddItem(FEFItemInstance& Item, int32 Amount)
 	}
 	
 	// 빈 슬롯에 추가 시도
-	for (FEFItemStack& Slot : Slots)
+	for (int i=0; i<Slots.Num(); i++)
 	{
+		FEFItemStack& Slot = Slots[i];
 		if (Slot.IsEmpty() && !Slot.bIsLocked)
 		{
 			Slot.Item.ItemData = Item.ItemData;
@@ -64,6 +68,8 @@ int32 UEFInventoryComponent::AddItem(FEFItemInstance& Item, int32 Amount)
 			
 			Slot.Quantity += ToAdd;
 			Amount -= ToAdd;
+			
+			OnItemChanged.Broadcast(i, Slot);
 			
 			if (Amount <= 0)
 			{
@@ -79,6 +85,11 @@ void UEFInventoryComponent::AddItem(FEFItemStack& Item)
 {
 	int32 ret = AddItem(Item.Item, Item.Quantity);
 	Item.Quantity = ret;
+	
+	if (Item.Quantity <= 0 && !Item.bIsLocked)
+	{
+		Item.Item.ItemData = nullptr;
+	}
 }
 
 void UEFInventoryComponent::AddItem(FEFItemStack& Item, int32 SlotIndex)
@@ -101,14 +112,22 @@ void UEFInventoryComponent::AddItem(FEFItemStack& Item, int32 SlotIndex)
 		Slot.Quantity += ToAdd;
 		Item.Quantity -= ToAdd;
 	}
+	
+	if (Item.Quantity <= 0 && !Item.bIsLocked)
+	{
+		Item.Item.ItemData = nullptr;
+	}
+	
+	OnItemChanged.Broadcast(SlotIndex, Slot);
 }
 
 bool UEFInventoryComponent::RemoveItem(FEFItemInstance& Item, int32 Amount)
 {
 	EFCHECK(HasEnoughItem(Item, Amount), false);
 
-	for (FEFItemStack& Slot : Slots)
+	for (int i=0; i<Slots.Num(); i++)
 	{
+		FEFItemStack& Slot = Slots[i];
 		if (Slot.CanStackWith(Item))
 		{
 			int32 ToRemove = FMath::Min(Amount, Slot.Quantity);
@@ -119,6 +138,9 @@ bool UEFInventoryComponent::RemoveItem(FEFItemInstance& Item, int32 Amount)
 			{
 				Slot.Item.ItemData = nullptr;
 			}
+			
+			OnItemChanged.Broadcast(i, Slot);
+			
 			if (Amount <= 0) 
 			{
 				return true;
@@ -139,6 +161,14 @@ bool UEFInventoryComponent::HasEnoughItem(FEFItemInstance& Item, int32 Amount)
 		}
 	}
 	return TotalFound >= Amount;
+}
+
+void UEFInventoryComponent::ChangeItem(FEFItemStack& Item, int32 SlotIndex)
+{
+	Slots[SlotIndex].Item.ItemData = Item.Item.ItemData;
+	Slots[SlotIndex].Quantity = Item.Quantity;
+	Slots[SlotIndex].bIsLocked = Item.bIsLocked;
+	OnItemChanged.Broadcast(SlotIndex, Slots[SlotIndex]);
 }
 
 void UEFInventoryComponent::SetupRecipe(TArray<FEFItemCount> ItemCounts)

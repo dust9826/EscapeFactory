@@ -14,7 +14,7 @@
 FReply UEFInventorySlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	// Ctrl + LeftMouse
-	if (InMouseEvent.IsControlDown() && InMouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton))
+	if (!bIsEmpty && InMouseEvent.IsControlDown() && InMouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton))
 	{
 		if (AEFPlayerController* PC = Cast<AEFPlayerController>(GetOwningPlayer()))
 		{
@@ -37,6 +37,9 @@ FReply UEFInventorySlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeomet
 			PC->SetSelectedSlot(nullptr); // 스왑 후 선택 해제
 			return FReply::Handled();
 		}
+		
+		if (bIsEmpty)
+			return FReply::Unhandled();
 
 		// [Case 1] 처음 클릭 시 -> 이 슬롯을 선택 상태로 후보 등록
 		if (PC) PC->SetSelectedSlot(this);
@@ -96,6 +99,7 @@ void UEFInventorySlotWidget::UpdateSlot(const FEFItemStack& NewStack)
 	{
 		ItemIcon->SetVisibility(ESlateVisibility::Hidden);
 		StackCountText->SetVisibility(ESlateVisibility::Hidden);
+		bIsEmpty = true;
 		return;
 	}
 	
@@ -110,6 +114,8 @@ void UEFInventorySlotWidget::UpdateSlot(const FEFItemStack& NewStack)
 		StackCountText->SetText(FText::AsNumber(NewStack.Quantity));
 		StackCountText->SetVisibility(ESlateVisibility::Visible);
 	}
+	
+	bIsEmpty = false;
 }
 
 FEFItemStack& UEFInventorySlotWidget::GetItemStack()

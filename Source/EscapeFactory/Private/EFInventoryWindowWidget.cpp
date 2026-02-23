@@ -8,10 +8,14 @@
 #include "Components/UniformGridPanel.h"
 #include "Components/UniformGridSlot.h"
 
-void UEFInventoryWindowWidget::RefreshInventory(UEFInventoryComponent* InventoryComponent)
+void UEFInventoryWindowWidget::ConnectInventory(UEFInventoryComponent* InventoryComponent)
 {
+	if (InventoryComponent != nullptr)
+		DetachInventory();
+	
 	EFCHECK(nullptr != ItemGrid);
 	ItemGrid->ClearChildren();
+	SlotWidgets.Empty();
 	
 	EFCHECK(nullptr != InventoryComponent);
 	const auto InventorySlots = InventoryComponent->GetSlots();
@@ -23,9 +27,10 @@ void UEFInventoryWindowWidget::RefreshInventory(UEFInventoryComponent* Inventory
 		if (NewSlot)
 		{
 			NewSlot->SetupSlot(InventoryComponent, i);
-			// 데이터 주입 (아까 만든 UpdateSlot 호출)
 			NewSlot->UpdateSlot(InventorySlots[i]);
-
+			
+			SlotWidgets.Add(NewSlot);
+			
 			// 3. 그리드에 배치 (행, 열 계산)
 			int32 Row = i / SlotsPerRow;
 			int32 Column = i % SlotsPerRow;
@@ -39,4 +44,26 @@ void UEFInventoryWindowWidget::RefreshInventory(UEFInventoryComponent* Inventory
 			}
 		}
 	}
+	
+	SourceInventoryComponent = InventoryComponent;
+	
+	SourceInventoryComponent->OnItemChanged.AddUObject(this, &UEFInventoryWindowWidget::RefreshSlot);
+}
+
+void UEFInventoryWindowWidget::RefreshSlot(int32 SlotIndex, const FEFItemStack& ItemStack)
+{
+	if (SlotWidgets.IsValidIndex(SlotIndex))
+	{
+		SlotWidgets[SlotIndex]->UpdateSlot(ItemStack);
+	}
+}
+
+void UEFInventoryWindowWidget::DetachInventory()
+{
+	if (SourceInventoryComponent && InventoryUpdateHandle.IsValid())
+	{
+		SourceInventoryComponent->OnItemChanged.Remove(InventoryUpdateHandle);
+		InventoryUpdateHandle.Reset();
+	}
+	SourceInventoryComponent = nullptr;
 }

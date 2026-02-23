@@ -5,10 +5,17 @@
 
 #include "EFInventoryWindowWidget.h"
 
-void UEFMachineMenuWidget::RefreshInventorys(UEFInventoryComponent* PlayerInven, UEFInventoryComponent* InputInven,
+void UEFMachineMenuWidget::ConnectInventorys(UEFInventoryComponent* PlayerInven, UEFInventoryComponent* InputInven,
 	UEFInventoryComponent* OutputInven)
 {
-	PlayerInventoryWidget->RefreshInventory(PlayerInven);
-	MachineInputInventoryWidget->RefreshInventory(InputInven);
-	MachineOutputInventoryWidget->RefreshInventory(OutputInven);
+	PlayerInventoryWidget->ConnectInventory(PlayerInven);
+	MachineInputInventoryWidget->ConnectInventory(InputInven);
+	MachineOutputInventoryWidget->ConnectInventory(OutputInven);
+}
+
+void UEFMachineMenuWidget::DetachInventorys()
+{
+	PlayerInventoryWidget->DetachInventory();
+	MachineInputInventoryWidget->DetachInventory();
+	MachineOutputInventoryWidget->DetachInventory();
 }

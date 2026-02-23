@@ -56,7 +56,7 @@ public:
 	
 	void HandleQuickMove(UEFInventoryComponent* SourceInv, int32 SlotIndex);
 		
-	void SwapSlot(UEFInventorySlotWidget* Slot1, UEFInventorySlotWidget* Slot2);
+	void SwapSlot(UEFInventorySlotWidget* FromSlot, UEFInventorySlotWidget* ToSlot);
 	
 	void MoveSlot(UEFInventorySlotWidget* FromSlot, UEFInventorySlotWidget* ToSlot);
 	

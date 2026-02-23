@@ -28,6 +28,7 @@ protected:
 	UEFInventoryWindowWidget* MachineOutputInventoryWidget;
 	
 public:
-	void RefreshInventorys(UEFInventoryComponent* PlayerInven,
+	void ConnectInventorys(UEFInventoryComponent* PlayerInven,
 		UEFInventoryComponent* InputInven, UEFInventoryComponent* OutputInven);
+	void DetachInventorys();
 };

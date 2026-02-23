@@ -129,7 +129,7 @@ void AEFPlayerController::UpdatePlayerInventory()
 	{
 		if (AEFCharacter* EFChar = Cast<AEFCharacter>(GetPawn()))
 		{
-			PlayerMenuWidget->PlayerInventoryWidget->RefreshInventory(EFChar->GetInventoryComponent());
+			PlayerMenuWidget->PlayerInventoryWidget->ConnectInventory(EFChar->GetInventoryComponent());
 			CurrentInventoryComponent = EFChar->GetInventoryComponent();
 		}
 	}
@@ -139,7 +139,7 @@ void AEFPlayerController::UpdateMachineMenu(AEFMachineBase* MachineBase)
 {
 	if (AEFCharacter* EFChar = Cast<AEFCharacter>(GetPawn()))
 	{
-		MachineMenuWidget->RefreshInventorys(EFChar->GetInventoryComponent(), 
+		MachineMenuWidget->ConnectInventorys(EFChar->GetInventoryComponent(), 
 			MachineBase->GetInputInventoryComponent(), MachineBase->GetOutputInventoryComponent());
 		CurrentTargetMachine = MachineBase;
 	}
@@ -158,20 +158,43 @@ void AEFPlayerController::HandleQuickMove(class UEFInventoryComponent* SourceInv
 	
 		DestinationInv->AddItem(ItemStack);
 		
+		SourceInv->OnItemChanged.Broadcast(SlotIndex, ItemStack);
+		
 		UpdateMachineMenu(CurrentTargetMachine);
 	}
 }
 
-void AEFPlayerController::SwapSlot(UEFInventorySlotWidget* Slot1, UEFInventorySlotWidget* Slot2)
+void AEFPlayerController::SwapSlot(UEFInventorySlotWidget* FromSlot, UEFInventorySlotWidget* ToSlot)
 {
-	EFLOG(Warning, TEXT("SwapSlot"));
+	FEFItemStack& FromItemStack = FromSlot->GetItemStack();
+	FEFItemStack& ToItemStack = ToSlot->GetItemStack();
+	
+	if (!FromItemStack.IsEmpty())
+	{
+		if (ToItemStack.CanStackWith(FromItemStack) || (ToItemStack.IsEmpty() && !ToItemStack.bIsLocked))
+		{
+			ToSlot->GetSourceInventory()->AddItem(FromItemStack, ToSlot->GetSlotIndex());
+			FromSlot->GetSourceInventory()->OnItemChanged.Broadcast(FromSlot->GetSlotIndex(), FromItemStack);
+		}
+		else if (!FromItemStack.bIsLocked && !ToItemStack.bIsLocked)
+		{
+			EFLOG_S(Warning);
+			FEFItemStack FromTemp = FromItemStack;
+			FEFItemStack ToTemp = ToItemStack;
+			FromSlot->GetSourceInventory()->ChangeItem(ToTemp, FromSlot->GetSlotIndex());
+			ToSlot->GetSourceInventory()->ChangeItem(FromTemp, ToSlot->GetSlotIndex());
+		}
+	}
 }
 
 void AEFPlayerController::MoveSlot(UEFInventorySlotWidget* FromSlot, UEFInventorySlotWidget* ToSlot)
 {
 	FEFItemStack& FromItemStack = FromSlot->GetItemStack();
-	ToSlot->GetSourceInventory()->AddItem(FromItemStack, ToSlot->GetSlotIndex());
-	EFLOG(Warning, TEXT("MoveSlot"));
+	if (!FromItemStack.IsEmpty())
+	{
+		ToSlot->GetSourceInventory()->AddItem(FromItemStack, ToSlot->GetSlotIndex());
+		FromSlot->GetSourceInventory()->OnItemChanged.Broadcast(FromSlot->GetSlotIndex(), FromItemStack);
+	}
 }
 
 UEFInventoryComponent* AEFPlayerController::FindDestinationInventory(UEFInventoryComponent* SourceInv)

@@ -45,6 +45,8 @@ private:
 	UPROPERTY()
 	int32 SlotIndex;
 	
+	bool bIsEmpty;
+	
 public:
 	UEFInventoryComponent* GetSourceInventory() const { return SourceInventory; }
 	int32 GetSlotIndex() const { return SlotIndex; }

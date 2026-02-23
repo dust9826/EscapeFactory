@@ -11,6 +11,8 @@ struct FEFItemInstance;
 struct FEFItemStack;
 struct FEFItemCount;
 
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnInventoryItemChanged, int32, const FEFItemStack&);
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ESCAPEFACTORY_API UEFInventoryComponent : public UActorComponent
 {
@@ -33,6 +35,8 @@ public:
 	
 	bool HasEnoughItem(FEFItemInstance& Item, int32 Amount);
 	
+	void ChangeItem(FEFItemStack& Item, int32 SlotIndex);
+	
 public:
 	// Machine 레시피 고정에 필요. 상속으로 빼도 될듯.
 	void SetupRecipe(TArray<FEFItemCount> ItemCounts);
@@ -40,6 +44,9 @@ public:
 	TArray<FEFItemStack>& GetSlots();
 	
 	void SetMaxSlots(int32 Size);
+	
+public:
+	FOnInventoryItemChanged OnItemChanged;
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
