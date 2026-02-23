@@ -9,6 +9,7 @@
 #include "EFInventorySlotWidget.h"
 #include "EFInventoryWindowWidget.h"
 #include "EFItemDataAsset.h"
+#include "EFItemVisualWidget.h"
 #include "EFMachineBase.h"
 #include "EFMachineMenuWidget.h"
 #include "EFPlayerMenuWidget.h"
@@ -42,6 +43,12 @@ void AEFPlayerController::BeginPlay()
 	EFCHECK(nullptr != MachineMenuWidget);
 	MachineMenuWidget->AddToViewport();
 	MachineMenuWidget->SetVisibility(ESlateVisibility::Collapsed);
+	
+	EFCHECK(nullptr != ItemVisualWidgetClass);
+	ItemVisualWidget = CreateWidget<UEFItemVisualWidget>(this, ItemVisualWidgetClass);
+	EFCHECK(nullptr != ItemVisualWidget);
+	ItemVisualWidget->AddToViewport();
+	ItemVisualWidget->SetVisibility(ESlateVisibility::Hidden);
 	
 	ChangeUIState(EEFUIState::None);
 }

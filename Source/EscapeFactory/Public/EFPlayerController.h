@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "EFPlayerController.generated.h"
 
+class UEFItemVisualWidget;
 class UEFInventorySlotWidget;
 class UEFInventoryComponent;
 class UEFMachineMenuWidget;
@@ -86,6 +87,12 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category="UI")
 	UEFMachineMenuWidget* MachineMenuWidget;
+	
+	UPROPERTY(EditAnywhere, Category="UI")
+	TSubclassOf<UEFItemVisualWidget> ItemVisualWidgetClass;
+	
+	UPROPERTY(EditAnywhere, Category="UI")
+	UEFItemVisualWidget* ItemVisualWidget;
 	
 private:
 	UPROPERTY()

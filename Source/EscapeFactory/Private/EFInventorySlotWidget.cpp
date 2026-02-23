@@ -6,6 +6,7 @@
 #include "EFInventoryComponent.h"
 #include "EFInventoryDragDropOp.h"
 #include "EFItemDataAsset.h"
+#include "EFItemVisualWidget.h"
 #include "EFPlayerController.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
@@ -35,6 +36,11 @@ FReply UEFInventorySlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeomet
 				PC->SwapSlot(PC->GetSelectedSlot(), this);
 			}
 			PC->SetSelectedSlot(nullptr); // 스왑 후 선택 해제
+			
+			if (PC && PC->ItemVisualWidget)
+			{
+				PC->ItemVisualWidget->SetVisibility(ESlateVisibility::Collapsed);
+			}
 			return FReply::Handled();
 		}
 		
@@ -44,6 +50,12 @@ FReply UEFInventorySlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeomet
 		// [Case 1] 처음 클릭 시 -> 이 슬롯을 선택 상태로 후보 등록
 		if (PC) PC->SetSelectedSlot(this);
 
+		if (PC && PC->ItemVisualWidget)
+		{
+			PC->ItemVisualWidget->SetVisibility(ESlateVisibility::HitTestInvisible);
+			PC->ItemVisualWidget->UpdateVisual(ItemIcon, StackCountText->GetText());
+		}
+		
 		// [Case 2] 드래그 감지 예약
 		// 마우스를 떼지 않고 움직이면 NativeOnDragDetected로 넘어감
 		return FReply::Unhandled().DetectDrag(TakeWidget(), EKeys::LeftMouseButton);
@@ -57,6 +69,8 @@ void UEFInventorySlotWidget::NativeOnDragDetected(const FGeometry& InGeometry, c
 {
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
 	
+	UEFInventoryDragDropOp* DragOp = NewObject<UEFInventoryDragDropOp>();DragOp->SourceSlotWidget = this;
+	
 	AEFPlayerController* PC = Cast<AEFPlayerController>(GetOwningPlayer());
         
 	if (PC && PC->GetSelectedSlot())
@@ -64,8 +78,6 @@ void UEFInventorySlotWidget::NativeOnDragDetected(const FGeometry& InGeometry, c
 		PC->SetSelectedSlot(nullptr);
 	}
 	
-	UEFInventoryDragDropOp* DragOp = NewObject<UEFInventoryDragDropOp>();DragOp->SourceSlotWidget = this;
-
 	OutOperation = DragOp; 
 }
 
@@ -74,9 +86,16 @@ bool UEFInventorySlotWidget::NativeOnDrop(const FGeometry& InGeometry, const FDr
 {
 	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 	
+	AEFPlayerController* PC = Cast<AEFPlayerController>(GetOwningPlayer());
+		
+	if (PC && PC->ItemVisualWidget)
+	{
+		PC->ItemVisualWidget->SetVisibility(ESlateVisibility::Collapsed);
+		EFLOG_S(Warning);
+	}
+	
 	if (UEFInventoryDragDropOp* DragOp = Cast<UEFInventoryDragDropOp>(InOperation))
 	{
-		AEFPlayerController* PC = Cast<AEFPlayerController>(GetOwningPlayer());
 		if (PC)
 		{
 			PC->MoveSlot(DragOp->SourceSlotWidget, this);

@@ -12,6 +12,8 @@ class ESCAPEFACTORY_API UEFInventoryDragDropOp : public UDragDropOperation
 {
 	GENERATED_BODY()
 
+	void DragCancelled_Implementation(const FPointerEvent& PointerEvent) override;
+	
 public:
 	UPROPERTY(BlueprintReadWrite)
 	class UEFInventorySlotWidget* SourceSlotWidget;
