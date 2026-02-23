@@ -42,9 +42,6 @@ void UEFItemVisualWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaT
 		float ViewportScale = UWidgetLayoutLibrary::GetViewportScale(GetWorld());
 		FVector2D CorrectedPos = MousePosition * ViewportScale;
 		
-		EFLOG(Warning, TEXT("%f"), MousePosition.X);
-		EFLOG(Warning, TEXT("%f"), ViewportScale);
-		
 		SetPositionInViewport(CorrectedPos);
 	}
 }

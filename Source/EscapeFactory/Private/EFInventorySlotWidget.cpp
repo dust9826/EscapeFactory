@@ -91,7 +91,6 @@ bool UEFInventorySlotWidget::NativeOnDrop(const FGeometry& InGeometry, const FDr
 	if (PC && PC->ItemVisualWidget)
 	{
 		PC->ItemVisualWidget->SetVisibility(ESlateVisibility::Collapsed);
-		EFLOG_S(Warning);
 	}
 	
 	if (UEFInventoryDragDropOp* DragOp = Cast<UEFInventoryDragDropOp>(InOperation))
