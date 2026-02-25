@@ -85,8 +85,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Machine")
 	FString MachineName;
 	
+	UPROPERTY(EditAnywhere, Category = "Production")
+	TArray<UEFRecipeDataAsset*> AvailableRecipes;
+	
 public:
 	UEFInventoryComponent* GetInputInventoryComponent() { return InputInventory; }
 	UEFInventoryComponent* GetOutputInventoryComponent() { return OutputInventory; }
-	
+	EEFMachineState GetMachineState() { return CurrentState; }
+	TArray<UEFRecipeDataAsset*> GetAvailableRecipes() { return AvailableRecipes; }
 };

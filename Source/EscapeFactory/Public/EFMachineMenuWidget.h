@@ -8,6 +8,8 @@
 
 class UEFInventoryWindowWidget;
 class UEFInventoryComponent;
+class UWidgetSwitcher;
+class AEFMachineBase;
 
 /**
  * 
@@ -27,8 +29,14 @@ protected:
 	UPROPERTY(meta = (BindWidget, AllowPrivateAccess = "true"))
 	UEFInventoryWindowWidget* MachineOutputInventoryWidget;
 	
+	UPROPERTY(meta = (BindWidget, AllowPrivateAccess = "true"))
+	UWidgetSwitcher* MenuSwitcherWidget;
+	
 public:
-	void ConnectInventorys(UEFInventoryComponent* PlayerInven,
-		UEFInventoryComponent* InputInven, UEFInventoryComponent* OutputInven);
+	void ConnectInventorys(UEFInventoryComponent* PlayerInven, AEFMachineBase* MachineBase);
 	void DetachInventorys();
+	
+	void SwitchToRecipeList();
+	
+	void SwitchToProduction();
 };

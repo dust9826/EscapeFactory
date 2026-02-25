@@ -38,6 +38,9 @@ public:
 	TArray<FEFItemCount> OutputItem;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Recipe")
+	UTexture2D* Icon;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Recipe")
 	float ProductionTime = 1.0f;
 	
 public:

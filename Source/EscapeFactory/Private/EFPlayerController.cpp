@@ -146,8 +146,7 @@ void AEFPlayerController::UpdateMachineMenu(AEFMachineBase* MachineBase)
 {
 	if (AEFCharacter* EFChar = Cast<AEFCharacter>(GetPawn()))
 	{
-		MachineMenuWidget->ConnectInventorys(EFChar->GetInventoryComponent(), 
-			MachineBase->GetInputInventoryComponent(), MachineBase->GetOutputInventoryComponent());
+		MachineMenuWidget->ConnectInventorys(EFChar->GetInventoryComponent(), MachineBase);
 		CurrentTargetMachine = MachineBase;
 	}
 }

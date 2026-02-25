@@ -22,7 +22,7 @@ void UEFItemVisualWidget::UpdateVisual(UImage* Icon, FText Text)
 		StackCountText->SetVisibility(ESlateVisibility::Visible);
 	}
 	
-	if (!IsInViewport())
+	if (!IsInViewport())					
 	{
 		AddToViewport(999); 
 	}
