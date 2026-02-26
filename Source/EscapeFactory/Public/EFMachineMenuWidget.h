@@ -8,6 +8,8 @@
 
 class UEFRecipeSelectWidget;
 class UButton;
+class UProgressBar;
+class UTextBlock;
 class UEFInventoryWindowWidget;
 class UEFInventoryComponent;
 class UWidgetSwitcher;
@@ -23,6 +25,7 @@ class ESCAPEFACTORY_API UEFMachineMenuWidget : public UUserWidget
 	
 public:
 	virtual void NativeConstruct() override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	
 protected:
 	UPROPERTY(meta = (BindWidget, AllowPrivateAccess = "true"))
@@ -37,11 +40,18 @@ protected:
 	UPROPERTY(meta = (BindWidget, AllowPrivateAccess = "true"))
 	UEFInventoryWindowWidget* MachineOutputInventoryWidget;
 	
+	UPROPERTY(meta = (BindWidget))
+	UProgressBar* ProductionProgressBar;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* ProgressText;
+	
 	UPROPERTY(meta = (BindWidget, AllowPrivateAccess = "true"))
 	UButton* RecipeSelectButton;
 	
 	UPROPERTY(meta = (BindWidget, AllowPrivateAccess = "true"))
 	UWidgetSwitcher* MenuSwitcherWidget;
+	
 	
 public:
 	void ConnectInventorys(UEFInventoryComponent* PlayerInven, AEFMachineBase* MachineBase);

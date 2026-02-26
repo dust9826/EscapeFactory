@@ -98,4 +98,6 @@ public:
 	UEFInventoryComponent* GetOutputInventoryComponent() { return OutputInventory; }
 	EEFMachineState GetMachineState() { return CurrentState; }
 	TArray<UEFRecipeDataAsset*> GetAvailableRecipes() { return AvailableRecipes; }
+	float GetCurrentProgress() { return CurrentProgress; }
+	UEFRecipeDataAsset* GetCurrentRecipe() { return CurrentRecipe; }
 };
