@@ -3,6 +3,7 @@
 
 #include "EFInventoryComponent.h"
 
+#include "EFDropItemActor.h"
 #include "EFItemDataAsset.h"
 #include "EFRecipeDataAsset.h"
 
@@ -13,6 +14,13 @@ UEFInventoryComponent::UEFInventoryComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 
+	ConstructorHelpers::FClassFinder<AEFDropItemActor>
+		BP_DROPITEM(TEXT("/Game/EscapeFactory/Blueprints/BP_DropItem.BP_DropItem_C"));
+	
+	if (BP_DROPITEM.Succeeded())
+	{
+		DropItemClass = BP_DROPITEM.Class;
+	}
 	// ...
 }
 
@@ -171,16 +179,55 @@ void UEFInventoryComponent::ChangeItem(FEFItemStack& Item, int32 SlotIndex)
 	OnItemChanged.Broadcast(SlotIndex, Slots[SlotIndex]);
 }
 
+void UEFInventoryComponent::DropItem(int32 SlotIndex)
+{
+	if (Slots[SlotIndex].IsEmpty())
+		return;
+	
+	AActor* Owner = GetOwner();
+	UWorld* World = GetWorld();
+	// 1. 월드 및 클래스 유효성 검사
+	EFCHECK(World != nullptr);
+	EFCHECK(DropItemClass != nullptr);
+
+	// 2. 스폰 위치 및 회전 설정 (보통 플레이어 앞쪽)
+	FVector SpawnLocation = Owner->GetActorLocation() + Owner->GetActorForwardVector() * 300.0f;
+	FRotator SpawnRotation = FRotator::ZeroRotator;
+
+	// 3. 스폰 설정 (충돌 처리 등)
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = nullptr;
+	SpawnParams.Instigator = Cast<APawn>(GetOwner());
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	// 4. 액터 스폰
+	AEFDropItemActor* DroppedActor = World->SpawnActor<AEFDropItemActor>(DropItemClass, SpawnLocation, SpawnRotation, SpawnParams);
+
+	if (DroppedActor)
+	{
+		// 5. 스폰된 액터에 아이템 데이터 주입
+		DroppedActor->InitializeDrop(Slots[SlotIndex]);
+	}
+	
+	Slots[SlotIndex].Quantity = 0;
+	if (!Slots[SlotIndex].bIsLocked)
+	{
+		Slots[SlotIndex].Item.ItemData = nullptr;
+	}
+	OnItemChanged.Broadcast(SlotIndex, Slots[SlotIndex]);
+}
+
 void UEFInventoryComponent::SetupRecipe(TArray<FEFItemCount> ItemCounts)
 {
 	int recipeSize = ItemCounts.Num();
-
+	
 	EFCHECK(recipeSize <= MaxSlots);
 	for (int i = 0; i < recipeSize; i++)
 	{
 		Slots[i].Item.ItemData = ItemCounts[i].ItemData;
 		Slots[i].Quantity = 0;
 		Slots[i].bIsLocked = true;
+		OnItemChanged.Broadcast(i, Slots[i]);
 	}
 	
 	for (int i = recipeSize; i < MaxSlots; i++)
@@ -188,9 +235,18 @@ void UEFInventoryComponent::SetupRecipe(TArray<FEFItemCount> ItemCounts)
 		Slots[i].Item.ItemData = nullptr;
 		Slots[i].Quantity = 0;
 		Slots[i].bIsLocked = true;
+		OnItemChanged.Broadcast(i, Slots[i]);
 	}
 	
 	EFLOG(Warning, TEXT("This Function Force Slots Quantity to Zero. Check Later"));
+}
+
+void UEFInventoryComponent::DropRecipe()
+{
+	for (int i = 0; i < MaxSlots; i++)
+	{
+		DropItem(i);
+	}
 }
 
 TArray<FEFItemStack>& UEFInventoryComponent::GetSlots() 

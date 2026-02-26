@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "EFRecipeSelectWidget.generated.h"
 
+class UEFRecipeSlotWidget;
 class AEFMachineBase;
 class UEFRecipeDataAsset;
 class UEFInventorySlotWidget;
@@ -23,10 +24,10 @@ public:
 	
 public:
 	UPROPERTY(meta = (BindWidget))
-	class UUniformGridPanel* ItemGrid;
+	class UUniformGridPanel* RecipeGrid;
 	
 	UPROPERTY(EditAnywhere, Category = "Inventory")
-	TSubclassOf<UEFInventorySlotWidget> SlotWidgetClass;
+	TSubclassOf<UEFRecipeSlotWidget> SlotWidgetClass;
 	
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	int32 SlotsPerRow = 5;
@@ -36,5 +37,5 @@ private:
 	AEFMachineBase* MachineBaseSource;
 	
 	UPROPERTY(VisibleAnywhere, Category = "Inventory")
-	TArray<UEFInventorySlotWidget*> SlotWidgets;
+	TArray<UEFRecipeSlotWidget*> SlotWidgets;
 };

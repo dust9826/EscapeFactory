@@ -11,6 +11,8 @@ class UEFInventoryComponent;
 class UEFRecipeDataAsset;
 struct FEFItemStack;
 
+DECLARE_MULTICAST_DELEGATE(FOnMachineRecipeSelected);
+
 UENUM(BlueprintType)
 enum class EEFMachineState : uint8
 {
@@ -57,6 +59,9 @@ private:
 	void ProduceOutput();
 	void FlushRemainItems();
 	
+public:
+	FOnMachineRecipeSelected OnMachineRecipeSelected;
+	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Machine | Production")
 	float CurrentProgress = 0.0f;
@@ -85,7 +90,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Machine")
 	FString MachineName;
 	
-	UPROPERTY(EditAnywhere, Category = "Production")
+	UPROPERTY(EditAnywhere, Category = "Machine | Production", meta = (AllowPrivateAccess = "true"))
 	TArray<UEFRecipeDataAsset*> AvailableRecipes;
 	
 public:

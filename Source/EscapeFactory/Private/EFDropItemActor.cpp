@@ -14,16 +14,6 @@ AEFDropItemActor::AEFDropItemActor()
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
 	RootComponent = Mesh;
-	
-	static ConstructorHelpers::FObjectFinder<UEFItemDataAsset> 
-		ItemDataAsset(TEXT("/Game/EscapeFactory/DataAssets/Item/DA_Item_Scrap.DA_Item_Scrap"));
-	if (ItemDataAsset.Succeeded())
-	{
-		FEFItemInstance Item;
-		Item.ItemData = ItemDataAsset.Object;
-		ItemStack.Item = Item;
-		ItemStack.Quantity = 50;
-	}
 }
 
 // Called when the game starts or when spawned

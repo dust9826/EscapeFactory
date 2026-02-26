@@ -47,7 +47,7 @@ void UEFInventoryWindowWidget::ConnectInventory(UEFInventoryComponent* Inventory
 	
 	SourceInventoryComponent = InventoryComponent;
 	
-	SourceInventoryComponent->OnItemChanged.AddUObject(this, &UEFInventoryWindowWidget::RefreshSlot);
+	InventoryUpdateHandle = SourceInventoryComponent->OnItemChanged.AddUObject(this, &UEFInventoryWindowWidget::RefreshSlot);
 }
 
 void UEFInventoryWindowWidget::RefreshSlot(int32 SlotIndex, const FEFItemStack& ItemStack)

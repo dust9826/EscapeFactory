@@ -31,7 +31,6 @@ AEFMachineBase::AEFMachineBase()
 void AEFMachineBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
