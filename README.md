@@ -2,6 +2,8 @@
 
 Unreal Engine 5에서 C++과 블루프린트를 함께 써서 만든 1인칭 공장 자동화 프로젝트입니다(2026.02, 1인). 게임 안의 모든 액터를 "아이템"으로 추상화하는 것이 설계의 축입니다.
 
+![EscapeFactory 플레이 화면](docs/readme-cover.jpg)
+
 - 기술 Unreal Engine 5, C++, Blueprint, Enhanced Input
 
 ## 시스템
